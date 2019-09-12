@@ -505,11 +505,13 @@
                             .post(_this.isEdit ? "/member/update" : "/member/add", obj)
                             .then(res => {
                                 _this.stopclick = false;
-
-                                res.status === 1
-                                    ? _this.$Message.success(res.message)
-                                    : _this.$Message.error(res.message);
-                                _this.$router.push("/users");
+                                if (res.status === 1) {
+                                    _this.$Message.success(res.message)
+                                    _this.$router.push("/users");
+                                } else {
+                                    _this.$Message.error(res.message);
+                                }
+                                this.$emit('shuaxin');
                             });
                     } else {
                         this.$Message.error("Fail!");

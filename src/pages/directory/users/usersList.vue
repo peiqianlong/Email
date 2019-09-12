@@ -36,9 +36,11 @@
           @on-row-click="showDetail"
         >
           <template slot-scope="{ row, index }" slot="action">
-            <IconPoptip iconName="iconedit" title="Edit" @popClick="edit(row)"></IconPoptip>
-            <IconPoptip iconName="iconrename" title="Rename user" @popClick="rename(row)"></IconPoptip>
-            <IconPoptip iconName="iconadd_group" title="Add to groups" @popClick="addGroup(row)"></IconPoptip>
+            <IconPoptip :disabled="row.status" iconName="iconedit" title="Edit" @popClick="edit(row)"></IconPoptip>
+            <IconPoptip :disabled="row.status" iconName="iconrename" title="Rename user"
+                        @popClick="rename(row)"></IconPoptip>
+            <IconPoptip :disabled="row.status" iconName="iconadd_group" title="Add to groups"
+                        @popClick="addGroup(row)"></IconPoptip>
           </template>
         </Table>
       </div>
@@ -99,6 +101,16 @@
       </div>
     </Modal>
     <!-- 部门穿梭框弹层  end -->
+    <!-- 删除Modal start -->
+    <Modal
+      v-model="deleteModal"
+      title="Delete the member"
+      class-name="vertical-center-modal"
+      @on-ok="deleteOk()"
+    >
+      <div class="reminder">Are you sure to delete these members？</div>
+    </Modal>
+    <!-- 删除Modal end -->
   </div>
 </template>
 <script>
@@ -106,6 +118,7 @@
         props: ["rowData"],
         data() {
             return {
+                deleteModal: false, //删除弹层
                 //左侧树
                 id: 0, //部门id
                 departmentData: [],
@@ -135,7 +148,7 @@
                     {
                         type: "selection",
                         width: 52,
-                        align: "center"
+                        align: "center",
                     },
                     {
                         title: this.$t("userListTableTh.name"),
@@ -171,7 +184,7 @@
                         title: this.$t("userListTableTh.status"),
                         key: "status",
                         render: (h, params) => {
-                            let text = params.row.active === "0" ? "Disable" : "Enabled";
+                            let text = params.row.status === "1" ? "Occupied" : params.row.active === "0" ? "Disabled" : "Enabled";
                             return h("span", text);
                         }
                     },
@@ -241,6 +254,7 @@
                             _this.dataList = res.result.list;
                             _this.pageInfo = res.result.page_info;
                             _this.dataList.forEach(item => {
+                                item._disabled = item.status == 1 ? true : false;
                                 item.department = item.department.join(",");
                             });
                             _this.loading = false;
@@ -273,6 +287,10 @@
                     _this.$Message.warning("请选择成员");
                     return false;
                 } else {
+                    if (str === "delete") {
+                        _this.deleteModal = true;
+                        return false;
+                    }
                     _this.$request
                         .get(`/member/${str}`, {
                             id: _this.operationDataIds
@@ -286,6 +304,21 @@
                             }
                         });
                 }
+            },
+            //删除确认
+            deleteOk() {
+                this.$request
+                    .get(`/member/delete`, {
+                        id: this.operationDataIds
+                    })
+                    .then(res => {
+                        if (res.status === 1) {
+                            this.$Message.success(res.message);
+                            this.initList();
+                        } else {
+                            this.$Message.error(res.message);
+                        }
+                    });
             },
             //编辑
             edit(row) {

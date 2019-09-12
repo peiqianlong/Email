@@ -14,7 +14,7 @@
     </div>
     <!-- 左侧内容   end -->
     <!-- 右侧内容   start -->
-    <router-view :rowData="rowData"></router-view>
+    <router-view @shuaxin="initTree" :rowData="rowData"></router-view>
     <!-- 右侧内容   end -->
   </div>
 </template>
@@ -47,6 +47,7 @@
             },
             //初始化默认选中节点
             initTreeCheck(arr, filterId) {
+
                 if (Array.isArray(arr)) {
                     arr.forEach(item => {
                         if (item.id === filterId) {
@@ -60,6 +61,7 @@
             },
             //左侧树信息
             initTree() {
+
                 let _this = this;
                 _this.$request
                     .get("/department/index", {
@@ -98,8 +100,3 @@
         }
     };
 </script>
-<style lang="scss">
-  .flex-layout .flex-side .btm-footer {
-    cursor: pointer;
-  }
-</style>
