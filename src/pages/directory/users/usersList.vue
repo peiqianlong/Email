@@ -20,7 +20,7 @@
       <!-- 顶部操作区   end -->
       <div class="content-search">
         <div class="search iconfont iconsearch">
-          <Input :placeholder="$t('message.search')" />
+          <Input :placeholder="$t('message.search')"/>
         </div>
         <Select v-model="selectType" style="width:200px">
           <Option v-for="item in typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
@@ -81,7 +81,8 @@
                   v-for="item in groupList"
                   :key="item.id"
                   @click="groupItemClick(item)"
-                >{{item.group_name}}</li>
+                >{{item.group_name}}
+                </li>
               </ul>
             </div>
           </div>
@@ -101,301 +102,305 @@
   </div>
 </template>
 <script>
-export default {
-  props: ["rowData"],
-  data() {
-    return {
-      //左侧树
-      id: 0, //部门id
-      departmentData: [],
-      selectType: "1", //被选项值
-      loading: true,
-      //下拉选项
-      typeList: [
-        {
-          value: "1",
-          label: "all"
+    export default {
+        props: ["rowData"],
+        data() {
+            return {
+                //左侧树
+                id: 0, //部门id
+                departmentData: [],
+                selectType: "1", //被选项值
+                loading: true,
+                //下拉选项
+                typeList: [
+                    {
+                        value: "1",
+                        label: "all"
+                    },
+                    {
+                        value: "2",
+                        label: "enabled"
+                    },
+                    {
+                        value: "3",
+                        label: "disable"
+                    },
+                    {
+                        value: "4",
+                        label: "Occupied"
+                    }
+                ],
+                //表头
+                columns: [
+                    {
+                        type: "selection",
+                        width: 52,
+                        align: "center"
+                    },
+                    {
+                        title: this.$t("userListTableTh.name"),
+                        key: "username",
+                        ellipsis: true,
+                        tooltip: true
+                    },
+                    {
+                        title: this.$t("userListTableTh.title"),
+                        key: "position",
+                        ellipsis: true,
+                        tooltip: true
+                    },
+                    {
+                        title: this.$t("userListTableTh.section"),
+                        key: "department",
+                        ellipsis: true,
+                        tooltip: true
+                    },
+                    {
+                        title: this.$t("userListTableTh.phone_number"),
+                        key: "mobile",
+                        ellipsis: true,
+                        tooltip: true
+                    },
+                    {
+                        title: this.$t("userListTableTh.e_mail"),
+                        key: "mail_name",
+                        ellipsis: true,
+                        tooltip: true
+                    },
+                    {
+                        title: this.$t("userListTableTh.status"),
+                        key: "status",
+                        render: (h, params) => {
+                            let text = params.row.active === "0" ? "Disable" : "Enabled";
+                            return h("span", text);
+                        }
+                    },
+                    {
+                        width: 160,
+                        title: " ",
+                        align: "right",
+                        slot: "action"
+                    }
+                ],
+                //列表数据
+                dataList: [],
+                //分页信息
+                pageInfo: {
+                    page_current: 1,
+                    total: 0,
+                    page_size: 20,
+                    page_count: 0
+                },
+                renameModal: false, //重命名弹层
+                //更新名称
+                updateName: {
+                    id: "",
+                    username: ""
+                },
+                ruleUpdateName: {
+                    username: [
+                        {
+                            required: true,
+                            message: "Please fill in the usename.",
+                            trigger: "blur"
+                        }
+                    ]
+                },
+                ShuttleGroupModal: false, //群组穿梭框弹层
+                selectedGroup: [], //选中的群组
+                isEdit: 0, //编辑或新增
+                operationData: [], //删除、启用、禁用成员
+                groupList: [],
+                changeGroupMemberId: null //改变群组的成员id
+            };
         },
-        {
-          value: "2",
-          label: "enabled"
+        created() {
+            this.initList();
         },
-        {
-          value: "3",
-          label: "disable"
+        computed: {
+            operationDataIds() {
+                let arr = [];
+                this.operationData.forEach(item => {
+                    arr.push(item.id);
+                });
+                return arr;
+            }
+        },
+        methods: {
+            //列表信息
+            initList() {
+                let _this = this;
+                _this.$request
+                    .get("/member/list", {
+                        gid: _this.rowData.id ? _this.rowData.id : -1,
+                        page: _this.pageInfo.page_current,
+                        page_size: _this.pageInfo.page_size
+                    })
+                    .then(res => {
+                        if (res.status === 1) {
+                            _this.dataList = res.result.list;
+                            _this.pageInfo = res.result.page_info;
+                            _this.dataList.forEach(item => {
+                                item.department = item.department.join(",");
+                            });
+                            _this.loading = false;
+                        } else {
+                            _this.$Message.error(res.message);
+                        }
+                    });
+            },
+            //页码切换
+            changePage(val) {
+                this.pageInfo.page_current = val;
+                this.initList();
+            },
+            selectChange(selection) {
+                this.operationData = selection;
+            },
+            //添加成员
+            addUsers() {
+                this.isEdit = 0;
+                this.$router.push({
+                    path: "usersform",
+                    query: {
+                        isEdit: this.isEdit
+                    }
+                });
+            },
+            operationUsers(str) {
+                let _this = this;
+                if (_this.operationDataIds.length === 0) {
+                    _this.$Message.warning("请选择成员");
+                    return false;
+                } else {
+                    _this.$request
+                        .get(`/member/${str}`, {
+                            id: _this.operationDataIds
+                        })
+                        .then(res => {
+                            if (res.status === 1) {
+                                _this.$Message.success(res.message);
+                                _this.initList();
+                            } else {
+                                _this.$Message.error(res.message);
+                            }
+                        });
+                }
+            },
+            //编辑
+            edit(row) {
+                this.isEdit = 1;
+                this.$router.push({
+                    path: "usersform",
+                    query: {
+                        isEdit: this.isEdit,
+                        id: row.id
+                    }
+                });
+            },
+            //显示重命名弹层
+            rename(row) {
+                this.renameModal = true;
+                this.updateName.id = row.id;
+                this.updateName.username = row.username;
+            },
+            //确认重命名
+            renameOk() {
+                let _this = this;
+                this.$refs["updateName"].validate(valid => {
+                    if (valid) {
+                        _this.$request.post("/member/rename", _this.updateName).then(res => {
+                            if (res.status === 1) {
+                                _this.$Message.success(res.message);
+                                _this.initList();
+                            } else {
+                                _this.$Message.error(res.message);
+                            }
+                        });
+                    } else {
+                        this.$Message.error("Fail!");
+                    }
+                });
+            },
+            //显示群组弹层
+            addGroup(row) {
+                this.groupListGet();
+                this.ShuttleGroupModal = true;
+                this.changeGroupMemberId = row.id;
+                this.$request.get("/member/detail", {id: row.id}).then(res => {
+                    if (res.status === 1) {
+                        this.selectedGroup = res.result.group;
+                    }
+                });
+            },
+            //选中群组
+            groupItemClick(item) {
+                let obj = {
+                    group_id: "",
+                    group_name: ""
+                };
+                obj.group_id = item.id;
+                obj.group_name = item.group_name;
+                let flag = this.selectedGroup.findIndex(value => {
+                    return value.group_id == obj.group_id;
+                });
+                flag === -1 ? this.selectedGroup.push(obj) : "";
+            },
+            //获取群组信息
+            groupListGet() {
+                let _this = this;
+                _this.$request.get("/group/list").then(res => {
+                    if (res.status === 1) {
+                        _this.groupList = res.result.list;
+                    }
+                });
+            },
+            //删除群组
+            deleteGroup(item, index) {
+                this.selectedGroup.splice(index, 1);
+            },
+            //群组确认
+            groupOk() {
+                let _this = this;
+                let group_ids = [];
+                _this.selectedGroup.forEach(item => {
+                    group_ids.push(item.id);
+                });
+                if (group_ids.length > 0) {
+                    _this.$request
+                        .post("/member/changeGroup", {
+                            id: Number(_this.changeGroupMemberId),
+                            group_id: group_ids
+                        })
+                        .then(res => {
+                            if (res.status === 1) {
+                                _this.initList();
+                                _this.$Message.success(res.message);
+                            } else {
+                                _this.$Message.error(res.message);
+                            }
+                            _this.selectedGroup = [];
+                        });
+                }
+            },
+            groupCancle() {
+                this.selectedGroup = [];
+            },
+            //详情
+            showDetail(row) {
+                this.$router.push({
+                    path: "usersdetail",
+                    query: {
+                        id: row.id
+                    }
+                });
+            }
+        },
+        watch: {
+            rowData(val) {
+                this.loading = true;
+                this.initList();
+            }
         }
-      ],
-      //表头
-      columns: [
-        {
-          type: "selection",
-          width: 52,
-          align: "center"
-        },
-        {
-          title: this.$t("userListTableTh.name"),
-          key: "username",
-          ellipsis: true,
-          tooltip: true
-        },
-        {
-          title: this.$t("userListTableTh.title"),
-          key: "position",
-          ellipsis: true,
-          tooltip: true
-        },
-        {
-          title: this.$t("userListTableTh.section"),
-          key: "department",
-          ellipsis: true,
-          tooltip: true
-        },
-        {
-          title: this.$t("userListTableTh.phone_number"),
-          key: "mobile",
-          ellipsis: true,
-          tooltip: true
-        },
-        {
-          title: this.$t("userListTableTh.e_mail"),
-          key: "mail_name",
-          ellipsis: true,
-          tooltip: true
-        },
-        {
-          title: this.$t("userListTableTh.status"),
-          key: "status",
-          render: (h, params) => {
-            let text = params.row.status === "0" ? "Disable" : "Able";
-            return h("span", text);
-          }
-        },
-        {
-          width: 160,
-          title: " ",
-          align: "right",
-          slot: "action"
-        }
-      ],
-      //列表数据
-      dataList: [],
-      //分页信息
-      pageInfo: {
-        page_current: 1,
-        total: 0,
-        page_size: 20,
-        page_count: 0
-      },
-      renameModal: false, //重命名弹层
-      //更新名称
-      updateName: {
-        id: "",
-        username: ""
-      },
-      ruleUpdateName: {
-        username: [
-          {
-            required: true,
-            message: "Please fill in the usename.",
-            trigger: "blur"
-          }
-        ]
-      },
-      ShuttleGroupModal: false, //群组穿梭框弹层
-      selectedGroup: [], //选中的群组
-      isEdit: 0, //编辑或新增
-      operationData: [], //删除、启用、禁用成员
-      groupList: [],
-      changeGroupMemberId: null //改变群组的成员id
     };
-  },
-  created() {
-    this.initList();
-  },
-  computed: {
-    operationDataIds() {
-      let arr = [];
-      this.operationData.forEach(item => {
-        arr.push(item.id);
-      });
-      return arr;
-    }
-  },
-  methods: {
-    //列表信息
-    initList() {
-      let _this = this;
-      _this.$request
-        .get("/member/list", {
-          gid: _this.rowData.id ? _this.rowData.id : -1,
-          page: _this.pageInfo.page_current,
-          page_size: _this.pageInfo.page_size
-        })
-        .then(res => {
-          if (res.status === 1) {
-            _this.dataList = res.result.list;
-            _this.pageInfo = res.result.page_info;
-            _this.dataList.forEach(item => {
-              item.department = item.department.join(",");
-            });
-            _this.loading = false;
-          } else {
-            _this.$Message.error(res.message);
-          }
-        });
-    },
-    //页码切换
-    changePage(val) {
-      this.pageInfo.page_current = val;
-      this.initList();
-    },
-    selectChange(selection) {
-      this.operationData = selection;
-    },
-    //添加成员
-    addUsers() {
-      this.isEdit = 0;
-      this.$router.push({
-        path: "usersform",
-        query: {
-          isEdit: this.isEdit
-        }
-      });
-    },
-    operationUsers(str) {
-      let _this = this;
-      if (_this.operationDataIds.length === 0) {
-        _this.$Message.warning("请选择成员");
-        return false;
-      } else {
-        _this.$request
-          .get(`/member/${str}`, {
-            id: _this.operationDataIds
-          })
-          .then(res => {
-            if (res.status === 1) {
-              _this.$Message.success(res.message);
-              _this.initList();
-            } else {
-              _this.$Message.error(res.message);
-            }
-          });
-      }
-    },
-    //编辑
-    edit(row) {
-      this.isEdit = 1;
-      this.$router.push({
-        path: "usersform",
-        query: {
-          isEdit: this.isEdit,
-          id: row.id
-        }
-      });
-    },
-    //显示重命名弹层
-    rename(row) {
-      this.renameModal = true;
-      this.updateName.id = row.id;
-      this.updateName.username = row.username;
-    },
-    //确认重命名
-    renameOk() {
-      let _this = this;
-      this.$refs["updateName"].validate(valid => {
-        if (valid) {
-          _this.$request.post("/member/rename", _this.updateName).then(res => {
-            if (res.status === 1) {
-              _this.$Message.success(res.message);
-              _this.initList();
-            } else {
-              _this.$Message.error(res.message);
-            }
-          });
-        } else {
-          this.$Message.error("Fail!");
-        }
-      });
-    },
-    //显示群组弹层
-    addGroup(row) {
-      this.groupListGet();
-      this.ShuttleGroupModal = true;
-      this.changeGroupMemberId = row.id;
-      this.$request.get("/member/detail", { id: row.id }).then(res => {
-        if (res.status === 1) {
-          this.selectedGroup = res.result.group;
-        }
-      });
-    },
-    //选中群组
-    groupItemClick(item) {
-      let obj = {
-        group_id: "",
-        group_name: ""
-      };
-      obj.group_id = item.id;
-      obj.group_name = item.group_name;
-      let flag = this.selectedGroup.findIndex(value => {
-        return value.group_id == obj.group_id;
-      });
-      flag === -1 ? this.selectedGroup.push(obj) : "";
-    },
-    //获取群组信息
-    groupListGet() {
-      let _this = this;
-      _this.$request.get("/group/list").then(res => {
-        if (res.status === 1) {
-          _this.groupList = res.result.list;
-        }
-      });
-    },
-    //删除群组
-    deleteGroup(item, index) {
-      this.selectedGroup.splice(index, 1);
-    },
-    //群组确认
-    groupOk() {
-      let _this = this;
-      let group_ids = [];
-      _this.selectedGroup.forEach(item => {
-        group_ids.push(item.id);
-      });
-      if (group_ids.length > 0) {
-        _this.$request
-          .post("/member/changeGroup", {
-            id: Number(_this.changeGroupMemberId),
-            group_id: group_ids
-          })
-          .then(res => {
-            if (res.status === 1) {
-              _this.initList();
-              _this.$Message.success(res.message);
-            } else {
-              _this.$Message.error(res.message);
-            }
-            _this.selectedGroup = [];
-          });
-      }
-    },
-    groupCancle() {
-      this.selectedGroup = [];
-    },
-    //详情
-    showDetail(row) {
-      this.$router.push({
-        path: "usersdetail",
-        query: {
-          id: row.id
-        }
-      });
-    }
-  },
-  watch: {
-    rowData(val) {
-      this.loading = true;
-      this.initList();
-    }
-  }
-};
 </script>
