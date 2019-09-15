@@ -441,6 +441,11 @@
           opacity: 1;
         }
       }
+      &:first-child:hover {
+        .action {
+          opacity: 0;
+        }
+      }
     }
 
     .ms-tree-space {

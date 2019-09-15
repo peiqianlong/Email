@@ -90,6 +90,16 @@
       </div>
     </Modal>
     <!-- 成员穿梭框弹层  end -->
+    <!-- 删除Modal start -->
+    <Modal
+      v-model="deleteModal"
+      title="Delete the member"
+      class-name="vertical-center-modal"
+      @on-ok="deleteOk()"
+    >
+      <div class="reminder">Are you sure to delete these members？</div>
+    </Modal>
+    <!-- 删除Modal end -->
   </div>
 </template>
 <script>
@@ -97,6 +107,7 @@ export default {
   data() {
     return {
       loading: true,
+      deleteModal: false, //删除
       selectType: "1", //被选项值
       //下拉选项
       typeList: [
@@ -343,7 +354,17 @@ export default {
       if (arr.length === 0) {
         this.$Message.warning("请选择成员！");
         return false;
+      } else {
+        this.deleteModal = true;
       }
+    },
+    //确认上删除
+    deleteOk() {
+      let _this = this;
+      let arr = [];
+      this.removeMember.forEach(item => {
+        arr.push(item.id);
+      });
       _this.$request
         .get("/group/removeMember", {
           id: Number(_this.currentGroupId),
@@ -352,6 +373,7 @@ export default {
         .then(res => {
           if (res.status === 1) {
             _this.$Message.success(res.message);
+            this.removeMember = [];
             _this.initGroupList();
             _this.initMemberList(_this.currentGroupId);
           } else {

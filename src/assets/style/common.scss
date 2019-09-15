@@ -742,6 +742,8 @@ tr.ivu-table-row-hover {
 
   .ivu-modal {
     top: 0;
+    max-height: 90%;
+    overflow: auto;
   }
 }
 
