@@ -69,6 +69,10 @@ Vue.component('EMPage', EMPage);
 Vue.component('Icon', Icon);
 Vue.prototype.$Message = Message;
 /* eslint-disable no-new */
+//表格导出导入
+import Blob from "./utils/Blob"
+import Export2Excel from "./utils/Export2Excel"
+
 new Vue({
   el: '#app',
   router,

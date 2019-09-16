@@ -833,7 +833,7 @@ tr.ivu-table-row-hover {
   position: absolute;
   top: 0;
   left: 0;
-  border-width: 5px 5px 0 5px;
+  border-width: 5px 0 5px 5px;
   border-style: solid;
   border-color: $font-color4 transparent transparent transparent;
 }
@@ -1048,11 +1048,13 @@ fieldset[disabled] .ivu-input {
   width: 10px;
   height: 5px;
   left: 0;
+  top: 0;
   @include cancle-transition();
 }
 
 .ivu-tree-arrow-open i {
-  @include e-transformAll($rotate: rotate(180deg))
+  @include e-transformAll($rotate: rotate(90deg));
+  top: 5px;
 }
 
 .ivu-tree-empty {
@@ -1063,20 +1065,21 @@ fieldset[disabled] .ivu-input {
 
 .ivu-tree-title.ivu-tree-title-selected {
   color: $font-color5;
-  background: transparent;
+  //background: transparent;
 
   &:hover {
-    color: $font-color5;
+    //color: $font-color5;
   }
 }
 
 .ivu-tree-title:hover {
-  color: $font-color1;
-  background: transparent;
+  color: $font-color5;
+  //background: transparent;
 }
 
 .ivu-tree-title {
   padding: 3px 4px;
+  width: 100%;
   color: $font-color1;
 }
 
@@ -1254,7 +1257,7 @@ fieldset[disabled] .ivu-input {
 }
 
 .ivu-icon-ios-arrow-forward::before {
-  border-color: $font-color1 transparent transparent transparent;
+  border-color: transparent transparent transparent $font-color1;
 }
 
 .ivu-collapse-content {

@@ -457,6 +457,8 @@
       line-height: 1;
       width: 10px;
       height: 10px;
+      margin-left: 9px;
+
     }
 
     .ms-tree-space::before {
@@ -468,11 +470,14 @@
       color: $font-color4;
       cursor: pointer;
       vertical-align: middle;
+      display: inline-block;
+      @include e-transformAll($rotate: rotate(-90deg));
+
     }
 
     .ios-arrow-down {
       display: inline-block;
-      @include e-transformAll($rotate: rotate(180deg));
+      @include e-transformAll($rotate: rotate(0));
     }
   }
 </style>

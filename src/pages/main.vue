@@ -3,7 +3,7 @@
     <Header></Header>
     <Nav></Nav>
     <!-- 主体内容   start -->
-    <div class="content">
+    <div class="content" id="content">
       <router-view></router-view>
     </div>
     <!-- 主体内容   end -->

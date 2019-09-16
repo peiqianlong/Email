@@ -7,7 +7,7 @@
         <i class="iconfont iconmenu icon-button menu-btn" @click="toggleMenu"></i>
         <a href class="logo"></a>
         <div class="search iconfont iconsearch">
-          <Input :placeholder="this.$t('message.search')" />
+          <Input @on-enter="search" @on-blur="blur" v-model="searchValue" :placeholder="this.$t('message.search')"/>
         </div>
       </div>
       <!-- 头部左侧内容  end -->
@@ -34,7 +34,7 @@
           <ul class="poptip-content fn-clear">
             <li v-for="item in applicationList">
               <div class="image-box">
-                <img :src="item.imageUrl" alt />
+                <img :src="item.imageUrl" alt/>
               </div>
               <div class="text">{{item.text}}</div>
             </li>
@@ -44,11 +44,11 @@
         <!-- 用户  start -->
         <div class="user">
           <div class="head-portrait">
-            <img src alt />
+            <img src alt/>
           </div>
           <div class="poptip-content fn-clear">
             <div class="float-left">
-              <img src alt />
+              <img src alt/>
             </div>
             <div class="info">
               <div class="name">
@@ -69,222 +69,267 @@
   </div>
 </template>
 <script>
-export default {
-  data() {
-    return {
-      applicationList: [
-        {
-          imageUrl: "",
-          text: "Account"
+    export default {
+        data() {
+            return {
+                searchValue: "",//搜索
+                applicationList: [
+                    {
+                        imageUrl: "",
+                        text: "Account"
+                    },
+                    {
+                        imageUrl: "",
+                        text: "Admin"
+                    },
+                    {
+                        imageUrl: "",
+                        text: "maoyitong"
+                    },
+                    {
+                        imageUrl: "",
+                        text: "Account"
+                    },
+                    {
+                        imageUrl: "",
+                        text: "Admin"
+                    },
+                    {
+                        imageUrl: "",
+                        text: "maoyitong"
+                    }
+                ],
+                userInfo: this.$request.getLocal("userInfo"),
+            };
         },
-        {
-          imageUrl: "",
-          text: "Admin"
-        },
-        {
-          imageUrl: "",
-          text: "maoyitong"
-        },
-        {
-          imageUrl: "",
-          text: "Account"
-        },
-        {
-          imageUrl: "",
-          text: "Admin"
-        },
-        {
-          imageUrl: "",
-          text: "maoyitong"
+        methods: {
+            search() {
+
+                let str = this.searchValue;
+                let oP = document.getElementById("content");
+                if (!str) {
+                    location.reload();
+                } else {
+                    //若内容不存在即返回
+                    oP.innerHTML = oP.innerHTML.split(str).join('<span style="background-color: yellowgreen">' + str + '</span>')
+                }
+
+
+            },
+            blur() {
+                location.reload();
+            },
+            //左侧菜单显示隐藏
+            toggleMenu() {
+                this.$store.commit("menuToggle");
+            },
+            //注销
+            signOut() {
+                this.$request.removeLocal("sid");
+                window.location.href = "http://mail.phrmg.org";
+            }
         }
-      ],
-      userInfo: this.$request.getLocal("userInfo")
     };
-  },
-  methods: {
-    //左侧菜单显示隐藏
-    toggleMenu() {
-      this.$store.commit("menuToggle");
-    },
-    //注销
-    signOut() {
-      this.$request.removeLocal("sid");
-      window.location.href = "http://mail.phrmg.org";
-    }
-  }
-};
 </script>
 <style lang="scss" scoped>
-header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 64px;
-  min-width: 1200px;
-  padding: 0 28px;
-  z-index: 99;
-  background: #fff;
-  @include shadow(
-    $h-shadow: 0,
-    $v-shadow: 0,
-    $blur: 4px,
-    $spread-color: rgba(0, 0, 0, 0.2)
-  );
-  .float-left,
-  .float-right {
-    line-height: 64px;
-    font-size: 0;
-  }
-  .menu-btn,
-  .logo,
-  .search {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  .menu-btn {
-    cursor: pointer;
-  }
-  .logo {
-    width: 96px;
-    height: 28px;
-    background: url(../assets/images/ecer_logo.png) no-repeat;
-    margin-left: 16px;
-  }
-
-  .help,
-  .application,
-  .user {
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 18px;
-    position: relative;
-    .iconfont {
-      font-size: 18px;
-    }
-    &:hover .poptip-content {
-      visibility: visible;
-      opacity: 1;
-    }
-    &:hover .icon-button {
-      background: $background-color;
-    }
-  }
-  .user .head-portrait {
-    cursor: pointer;
-    @include image-show($width: 36px, $height: 36px);
-  }
-  .poptip-content {
-    position: absolute;
-    top: 51px;
-    right: -20px;
-    border: $border-style;
-    visibility: hidden;
-    opacity: 0;
-    border-radius: $border-radius1;
-    overflow: hidden;
+  header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 64px;
+    min-width: 1200px;
+    padding: 0 28px;
+    z-index: 99;
     background: #fff;
-    @include e-transition();
     @include shadow(
       $h-shadow: 0,
-      $v-shadow: 2px,
+      $v-shadow: 0,
       $blur: 4px,
-      $spread-color: rgba(0, 0, 0, 0.32)
+      $spread-color: rgba(0, 0, 0, 0.2)
     );
-    z-index: 2;
-  }
-  .help .poptip-content {
-    width: 178px;
-    padding: 8px 0;
-    li {
+
+    .float-left,
+    .float-right {
+      line-height: 64px;
       font-size: 0;
-      color: $font-color3;
-      padding: 0 13px;
-      line-height: 32px;
+    }
+
+    .menu-btn,
+    .logo,
+    .search {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .menu-btn {
       cursor: pointer;
-      @include e-transition($property: background);
-      i,
-      span {
-        display: inline-block;
-        vertical-align: middle;
+    }
+
+    .logo {
+      width: 96px;
+      height: 28px;
+      background: url(../assets/images/ecer_logo.png) no-repeat;
+      margin-left: 16px;
+    }
+
+    .help,
+    .application,
+    .user {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 18px;
+      position: relative;
+
+      .iconfont {
+        font-size: 18px;
       }
-      i {
-        margin-right: 9px;
+
+      &:hover .poptip-content {
+        visibility: visible;
+        opacity: 1;
       }
-      span {
-        font-size: $font-size;
-      }
-      &:hover {
+
+      &:hover .icon-button {
         background: $background-color;
       }
     }
-  }
-  .application .poptip-content {
-    width: 320px;
-    padding: 24px 28px;
-    li {
-      float: left;
-      width: 33.333333%;
-      height: 88px;
-      padding: 12px;
-      border: 1px solid transparent;
-      margin: 8px 0;
+
+    .user .head-portrait {
       cursor: pointer;
-      .image-box {
-        @include image-show();
-        margin: 0 auto;
-      }
-      &:hover {
-        border: $border-style;
-        border-radius: 4px;
-      }
-      .text {
-        font-size: $font-size;
-        line-height: 17px;
-        color: $font-color1;
-        text-align: center;
-        margin-top: 4px;
-      }
+      @include image-show($width: 36px, $height: 36px);
     }
-  }
-  .user .poptip-content {
-    padding: 20px 24px 20px 20px;
-    height: 140px;
-    .float-left {
-      @include image-show($width: 96px, $height: 96px);
+
+    .poptip-content {
+      position: absolute;
+      top: 51px;
+      right: -20px;
+      border: $border-style;
+      visibility: hidden;
+      opacity: 0;
+      border-radius: $border-radius1;
+      overflow: hidden;
+      background: #fff;
+      @include e-transition();
+      @include shadow(
+        $h-shadow: 0,
+        $v-shadow: 2px,
+        $blur: 4px,
+        $spread-color: rgba(0, 0, 0, 0.32)
+      );
+      z-index: 2;
     }
-    .info {
-      margin-left: 112px;
-      color: $font-color3;
-      font-size: $font-size;
-      line-height: 17px;
-      min-width: 140px;
-      .name {
+
+    .help .poptip-content {
+      width: 178px;
+      padding: 8px 0;
+
+      li {
         font-size: 0;
+        color: $font-color3;
+        padding: 0 13px;
+        line-height: 32px;
+        cursor: pointer;
+        @include e-transition($property: background);
+
         i,
         span {
           display: inline-block;
           vertical-align: middle;
         }
+
         i {
-          font-size: 16px;
-          margin-left: 10px;
+          margin-right: 9px;
         }
+
         span {
           font-size: $font-size;
-          color: $font-color1;
+        }
+
+        &:hover {
+          background: $background-color;
         }
       }
-      .email {
-        display: inline-block;
-        margin: 4px 0;
-        color: $font-color3;
+    }
+
+    .application .poptip-content {
+      width: 320px;
+      padding: 24px 28px;
+
+      li {
+        float: left;
+        width: 33.333333%;
+        height: 88px;
+        padding: 12px;
+        border: 1px solid transparent;
+        margin: 8px 0;
+        cursor: pointer;
+
+        .image-box {
+          @include image-show();
+          margin: 0 auto;
+        }
+
+        &:hover {
+          border: $border-style;
+          border-radius: 4px;
+        }
+
+        .text {
+          font-size: $font-size;
+          line-height: 17px;
+          color: $font-color1;
+          text-align: center;
+          margin-top: 4px;
+        }
       }
-      button {
-        padding: 5px 40px 6px;
-        margin-top: 4px;
+    }
+
+    .user .poptip-content {
+      padding: 20px 24px 20px 20px;
+      height: 140px;
+
+      .float-left {
+        @include image-show($width: 96px, $height: 96px);
+      }
+
+      .info {
+        margin-left: 112px;
+        color: $font-color3;
+        font-size: $font-size;
+        line-height: 17px;
+        min-width: 140px;
+
+        .name {
+          font-size: 0;
+
+          i,
+          span {
+            display: inline-block;
+            vertical-align: middle;
+          }
+
+          i {
+            font-size: 16px;
+            margin-left: 10px;
+          }
+
+          span {
+            font-size: $font-size;
+            color: $font-color1;
+          }
+        }
+
+        .email {
+          display: inline-block;
+          margin: 4px 0;
+          color: $font-color3;
+        }
+
+        button {
+          padding: 5px 40px 6px;
+          margin-top: 4px;
+        }
       }
     }
   }
-}
 </style>

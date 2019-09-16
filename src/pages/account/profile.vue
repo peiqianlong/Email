@@ -93,7 +93,8 @@
           <div class="profileitemlist ">
             <div class="text_left">Language:</div>
             <div class="text_right">
-              <Select v-model="Companyprofile.info.language" style="width:120px;height: 32px">
+              <Select @on-change="updatainfo('language')" v-model="Companyprofile.info.language"
+                      style="width:120px;height: 32px">
                 <Option v-for="item in Companyprofile.languages" :value="item.key" :key="item.key">{{ item.label }}
                 </Option>
               </Select>
@@ -102,7 +103,8 @@
           <div class="profileitemlist marignT12">
             <div class="text_left">Timezon:</div>
             <div class="text_right">
-              <Select v-model="Companyprofile.info.timezone" style="width:320px;height: 32px">
+              <Select @on-change="updatainfo('language')" v-model="Companyprofile.info.timezone"
+                      style="width:320px;height: 32px">
                 <Option v-for="item in Companyprofile.zones" :value="item.key" :key="item.key">{{ item.label }}</Option>
               </Select>
             </div>
@@ -280,6 +282,17 @@
         },
 
         methods: {
+            //更新信息
+            updatainfo(val) {
+                if (val === 'language') {
+                    this.$request.post("/company/prefsUpdate", {
+                        language: this.Companyprofile.info.language,
+                        timezone: this.Companyprofile.info.timezone
+                    }).then(res => {
+                        this.$Message.success(res.message);
+                    })
+                }
+            },
             //获取用户访问权限
             initList() {
                 this.$request.get("/company/index").then(res => {

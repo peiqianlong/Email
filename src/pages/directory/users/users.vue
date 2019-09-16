@@ -4,7 +4,7 @@
     <div class="flex-side">
       <div class="main-ctc">
         <div class="search iconfont iconsearch">
-          <Input :placeholder="$t('message.search')"/>
+          <Input @on-enter="Search" v-model="searchvalue" :placeholder="$t('message.search')"/>
         </div>
         <Tree :data="departmentTree" @on-select-change="treeClick"></Tree>
       </div>
@@ -25,13 +25,56 @@
                 //左侧树
                 id: 0, //部门id
                 rowData: [],
-                departmentTree: []
+                departmentTree: [],
+                searchvalue: "",//搜索value
+                searchinfo: [],
+
             };
         },
         created() {
             this.initTree();
         },
         methods: {
+            //搜索
+            Search() {
+                let _this = this;
+                _this.$request
+                    .get("/department/index", {
+                        id: _this.id,
+                        g_member: 1
+                    })
+                    .then(res => {
+                        if (res.status === 1) {
+                            let data = _this.treeDepthInit(res.result.list);
+                            data.length === 1 ? (data[0].expand = true) : "";
+                            _this.departmentTree = data;
+                            _this.rowData = data[0];
+                            this.searchinfo = [];
+                            let val = this.searchvalue;
+                            let tree = this.departmentTree;
+                            if (val !== '') {
+                                this.datalist(val, tree);
+                                this.departmentTree = this.searchinfo;
+                            }
+                        } else {
+                            _this.$Message.error(res.message);
+                        }
+                    });
+
+
+            },
+            //选出合适数据
+            datalist(val, tree) {
+                if (Array.isArray(tree)) {
+                    tree.forEach(item => {
+                        if (item.title.includes(val)) {
+                            this.searchinfo.push(item)
+                        } else if (item.children) {
+                            this.datalist(val, item.children);
+                        }
+                    })
+                }
+            },
             //初始化树数据结构
             treeDepthInit(arr, filterId = null) {
                 if (Array.isArray(arr)) {
