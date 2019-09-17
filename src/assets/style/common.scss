@@ -614,7 +614,7 @@ th .ivu-table-cell {
   color: $font-color1;
   font-weight: bold;
   text-transform: capitalize;
-
+  white-space:nowrap;
   .ivu-checkbox-inner {
     border-color: $font-color3;
   }
@@ -1048,7 +1048,7 @@ fieldset[disabled] .ivu-input {
   width: 10px;
   height: 5px;
   left: 0;
-  top: 0;
+  top: -3px;
   @include cancle-transition();
 }
 

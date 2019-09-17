@@ -303,7 +303,7 @@
                             });
                             _this.loading = false;
                         } else {
-                            _this.$Message.err(res.message);
+                            _this.$Message.error(res.message);
                         }
                     });
             },

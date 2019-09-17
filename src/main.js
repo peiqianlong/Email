@@ -10,6 +10,7 @@ import "babel-polyfill"
 import Es6Promise from 'es6-promise'
 import 'iview/dist/styles/iview.css';
 import './assets/style/index.scss';
+
 import {
   Input,
   Content,
@@ -68,6 +69,7 @@ Vue.component('IconPoptip', IconPoptip);
 Vue.component('EMPage', EMPage);
 Vue.component('Icon', Icon);
 Vue.prototype.$Message = Message;
+Vue.prototype.$Modal = Modal;
 /* eslint-disable no-new */
 //表格导出导入
 import Blob from "./utils/Blob"

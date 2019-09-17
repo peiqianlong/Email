@@ -32,7 +32,7 @@
             <button class="primary" @click.prevent="ResetNum">Reset</button>
           </FormItem>
           <FormItem label="Verify Password:" prop="password_verify">
-            <Input v-model.trim="formData.password_verify" type="password" style="width: 520px"></Input>
+            <Input :maxlength="16" v-model.trim="formData.password_verify" type="password" style="width: 520px"></Input>
           </FormItem>
           <FormItem label="gender:" prop="sex">
             <RadioGroup v-model="formData.sex">
