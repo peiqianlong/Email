@@ -614,7 +614,8 @@ th .ivu-table-cell {
   color: $font-color1;
   font-weight: bold;
   text-transform: capitalize;
-  white-space:nowrap;
+  white-space: nowrap;
+
   .ivu-checkbox-inner {
     border-color: $font-color3;
   }
@@ -1435,4 +1436,19 @@ fieldset[disabled] .ivu-input {
   position: absolute;
   left: 0;
   top: 0;
+}
+
+//搜索按钮大小
+.searchBtn {
+  display: inline-block;
+  width: 77px;
+  height: 32px;
+  background: $font-color5;
+  opacity: 1;
+  border-radius: 4px;
+  line-height: 32px;
+  text-align: center;
+  font-weight:bold;
+  color:rgba(255,255,255,1);
+  cursor: pointer;
 }

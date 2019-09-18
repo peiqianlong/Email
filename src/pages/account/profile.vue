@@ -225,7 +225,7 @@
                 <Table
                   ref="selection"
                   :columns="columnAasssress"
-                  :data="Aasssress"
+                  :data="CompanyAdd.list"
                   :loading="loading"
                 >
                   <template slot-scope="{ row, index }" slot="action">
@@ -438,16 +438,6 @@
                         slot: "action"
                     }
                 ],
-                Aasssress: [
-                    {
-                        username: "1",
-                        country_code: "1",
-                        section: "1",
-                        mobile: "1",
-                        mail_name: "1",
-                        active: "1",
-                    }
-                ],
                 addMemberModal: false, //添加成员弹层
                 selectedMember: [], //穿梭框被选中的成员
                 selectedMemberType: 0,//是否只查看enabled用户
@@ -613,7 +603,16 @@
             },
             //却认添加成员
             addMemberOk() {
-
+                let arr = []
+                this.selectedMember.forEach(item => {
+                    arr.push(item.member_id)
+                });
+                this.$request.post("/company/bookAdd", {member_id: arr}).then(res => {
+                    if (res.status) {
+                        this.$Message.success(res.message)
+                        this.initList();
+                    }
+                })
             },
             //取消选中的节点
             cancelTreeCheck(arr, filterId, prrentId) {
@@ -664,6 +663,12 @@
             //删除
             Del(val) {
 
+                this.$request.post("/company/bookDelete", {member_id: [val.member_id]}).then(res => {
+                    if (res.status) {
+                        this.$Message.success(res.message);
+                        this.initList();
+                    }
+                })
             }
 
         }
