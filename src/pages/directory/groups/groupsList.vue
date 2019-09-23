@@ -4,7 +4,7 @@
     <div class="flex-side">
       <div class="main-ctc">
         <div class="search iconfont iconsearch">
-          <Input v-model="textValue" @on-enter="search" :placeholder="$t('message.search')"/>
+          <Input v-model="textValue" @on-blur="blur" @on-enter="search" :placeholder="$t('message.search')"/>
         </div>
         <div class="left-list">
           <ul v-if="groupList.length>0">
@@ -35,7 +35,7 @@
         <!-- 顶部操作区   end -->
         <div class="content-search">
           <div class="search iconfont iconsearch">
-            <Input @on-enter="initGroupList" v-model="serchValue" :placeholder="$t('message.search')"/>
+            <Input @on-enter="initGroupList" @on-blur="blur2" v-model="serchValue" :placeholder="$t('message.search')"/>
           </div>
           <Select @on-change="initGroupList" v-model="selectType" style="width:200px;">
             <Option v-for="item in typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
@@ -178,7 +178,12 @@
                         title: "Status",
                         key: "active",
                         render: (h, params) => {
-                            let text = params.row.active === "1" ? "Able" : "Disable";
+                            let text =
+                                params.row.status === 1
+                                    ? "Occupied"
+                                    : params.row.active === 0
+                                    ? "Disabled"
+                                    : "Enabled";
                             return h("span", text);
                         }
                     }
@@ -196,6 +201,18 @@
             this.initGroupList();
         },
         methods: {
+            //失焦
+            blur() {
+                if (this.textValue == '') {
+                    this.initGroupList();
+                }
+            },
+            blur2() {
+                if (this.serchValue == '') {
+                    this.initMemberList(this.currentGroupId);
+                }
+            },
+
             //左侧搜索
             search() {
                 let _this = this;
@@ -259,7 +276,7 @@
                 _this.loading = true;
                 _this.$request
                     .get("/group/member", {
-                        id: group_id ? Number(group_id) : _this.groupList[0].id,
+                        id: group_id ? Number(group_id) : _this.currentGroupId,
                         search_name: this.serchValue,
                         search_type: this.selectType
                     })
@@ -339,6 +356,7 @@
             },
             //添加成员
             addMember() {
+                this.selectedMember = []
                 this.addMemberModal = true;
                 this.initMemberTree();
             },

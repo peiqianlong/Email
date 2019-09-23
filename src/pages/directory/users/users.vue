@@ -4,7 +4,7 @@
     <div class="flex-side">
       <div class="main-ctc">
         <div class="search iconfont iconsearch">
-          <Input @on-enter="Search" v-model="searchvalue" :placeholder="$t('message.search')"/>
+          <Input @on-enter="Search" @on-blur="blur" v-model="searchvalue" :placeholder="$t('message.search')"/>
         </div>
         <Tree :data="departmentTree" @on-select-change="treeClick"></Tree>
       </div>
@@ -35,6 +35,12 @@
             this.initTree();
         },
         methods: {
+            //失焦
+            blur() {
+                if (this.searchvalue == '') {
+                    this.initTree();
+                }
+            },
             //搜索
             Search() {
                 let _this = this;

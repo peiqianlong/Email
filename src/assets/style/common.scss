@@ -951,7 +951,9 @@ tr.ivu-table-row-hover {
 .ivu-checkbox-checked .ivu-checkbox-inner {
   border-color: $font-color3;
 }
-
+.ivu-checkbox-checked .ivu-checkbox-inner:after{
+  display: inline-block;
+}
 .ivu-radio-inner:after {
   background: $font-color3;
 }

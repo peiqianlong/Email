@@ -8,7 +8,13 @@
         <div class="item operation">
           <button>{{$t('operation.import')}}</button>
           <ul class="oper-list">
-            <li>{{$t('operation.import')}}</li>
+            <div style="height: 32px;position: relative">
+              <Upload action="/api/member/export" :show-upload-list='false' :data="uploaddata"
+                      :on-success="uploadsuccess" :on-error="uploadfile">
+                <li>{{$t('operation.import')}}</li>
+              </Upload>
+            </div>
+
             <li @click="temoDownLoad">{{$t('operation.download_the_template')}}</li>
           </ul>
         </div>
@@ -20,7 +26,7 @@
       <!-- 顶部操作区   end -->
       <div class="content-search">
         <div class="search iconfont iconsearch">
-          <Input @on-enter="initList" v-model="textValue" :placeholder="$t('message.search')"/>
+          <Input @on-enter="initList" @on-blur="blur" v-model="textValue" :placeholder="$t('message.search')"/>
         </div>
         <Select @on-change="initList" v-model="selectType" style="width:200px">
           <Option v-for="item in typeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
@@ -131,6 +137,11 @@
         props: ["rowData"],
         data() {
             return {
+                //上传文件附带的参数
+                uploaddata: {
+                    channel: "0001",
+                    sid: JSON.parse(window.localStorage.getItem("sid"))
+                },
                 textValue: "",//
                 deleteModal: false, //删除弹层
                 //左侧树
@@ -259,28 +270,58 @@
             }
         },
         methods: {
+            // 文件上传成功的行数
+            uploadsuccess() {
+                this.$Message.success("Upload success")
+            },
+            uploadfile(val) {
+                this.$Message.error("Upload failure")
+            },
+            //失焦
+            blur() {
+                if (this.textValue == '') {
+                    this.initList();
+                }
+            },
             //导出表格
             exportExel() {
-                this.loading = true;
-                require.ensure([], () => {
-                    const {export_json_to_excel} = require('../../../utils/Export2Excel') //这个地址和页面的位置相关，这个地址是Export2Excel.js相对于页面的相对位置
-                    const tHeader = ["Name", "Title", "Section", "Phone Number", "E-Mail", "Status"]; //这个是表头名称 可以是iveiw表格中表头属性的title的数组
-                    const filterVal = ["username", "position", "department", "mobile", "mail_name", "status"]; //与表格数据配合 可以是iview表格中的key的数组
-                    //格式化数据
-                    let datainfo = this.dataList;
-                    datainfo.forEach(item => {
-                        item.status = item.status === "1"
-                            ? "禁止操作"
-                            : item.active === "0"
-                                ? "启用"
-                                : "禁用";
-                    });
+                let _this = this
+                let arr = [];
+                this.operationData.forEach(item => {
+                    arr.push(item.id)
+                });
+                let prams = {
+                    gid: _this.rowData.id ? _this.rowData.id : -1,
+                    member_ids: arr,
+                    search_name: this.textValue,
+                    search_type: this.selectType
+                }
+                let sid = JSON.parse(window.localStorage.getItem("sid"))
+                window.open("http://api.phrmg.org/admin/member/export?sid=" + sid + "&gid=" + prams.gid + "&member_ids=" + prams.member_ids + "&search_name=" + prams.search_name + "&search_type=" + prams.search_type + "&channel=0001");
+                // this.$request.get('/member/export', prams).then(res => {
+                //     this.loading = false;
+                // })
 
-                    const list = datainfo; //表格数据，iview中表单数据也是这种格式！
-                    const data = this.formatJson(filterVal, list);
-                    export_json_to_excel(tHeader, data, '用户列表数据'); //列表excel  这个是导出表单的名称
-                    this.downloadLoading = false
-                })
+
+                // require.ensure([], () => {
+                //     const {export_json_to_excel} = require('../../../utils/Export2Excel') //这个地址和页面的位置相关，这个地址是Export2Excel.js相对于页面的相对位置
+                //     const tHeader = ["Name", "Title", "Section", "Phone Number", "E-Mail", "Status"]; //这个是表头名称 可以是iveiw表格中表头属性的title的数组
+                //     const filterVal = ["username", "position", "department", "mobile", "mail_name", "status"]; //与表格数据配合 可以是iview表格中的key的数组
+                //     //格式化数据
+                //     let datainfo = this.dataList;
+                //     datainfo.forEach(item => {
+                //         item.status = item.status === "1"
+                //             ? "禁止操作"
+                //             : item.active === "0"
+                //                 ? "启用"
+                //                 : "禁用";
+                //     });
+                //
+                //     const list = datainfo; //表格数据，iview中表单数据也是这种格式！
+                //     const data = this.formatJson(filterVal, list);
+                //     export_json_to_excel(tHeader, data, '用户列表数据'); //列表excel  这个是导出表单的名称
+                //     this.downloadLoading = false
+                // })
             },
             formatJson(filterVal, jsonData) {
                 this.loading = false;
@@ -289,29 +330,8 @@
             },
             //模板下载
             temoDownLoad() {
-                require.ensure([], () => {
-                    const {export_json_to_excel} = require('../../../utils/Export2Excel');
-                    const tHeader = ["Name", "Account", "Sex", "Phone Number", "Tel", "Address", "Section", "Title", 'Identity', 'Group', 'Logon_rights', 'Active', 'Status'];
-                    const filterVal = ["Name", "Account", "Sex", "Phone Number", "Tel", "Address", "Section", "Title", 'Identity', 'Group', 'Logon_rights', 'Active', 'Status'];
-                    const list = [{
-                        "Name": '成员',
-                        "Account": 'sssss@gia.com',
-                        "Sex": '男',
-                        "Phone Number": '+8615124579542',
-                        "Tel": '+865421587',
-                        "Address": '陕西省西安市',
-                        "Section": '部门1,部门2',
-                        "Title": 'title',
-                        'Identity': '普通用户',
-                        'Group': '测试',
-                        'Logon_rights': 'imap/smtp',
-                        'Active': '禁用',
-                        'Status': '否'
-                    }];
-                    const data = this.formatJson(filterVal, list);
-                    export_json_to_excel(tHeader, data, '模板'); //列表excel  这个是导出表单的名称
-                    this.downloadLoading = false
-                })
+                let sid = JSON.parse(window.localStorage.getItem("sid"))
+                window.open("http://api.phrmg.org/admin/member/download?sid=" + sid + "&channel=0001")
             },
 
             //列表信息
@@ -515,3 +535,10 @@
         }
     };
 </script>
+<style lang="scss">
+  /*.oper-list {*/
+  /*  .ivu-upload-list {*/
+  /*    display: none*/
+  /*  }*/
+  /*}*/
+</style>

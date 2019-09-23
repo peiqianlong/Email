@@ -57,7 +57,7 @@
           ></Table>
         </div>
         <div v-else class="Rights">
-          <Tree :data="roleList" show-checkbox></Tree>
+          <Tree @on-check-change="selectright" :data="roleList" show-checkbox></Tree>
         </div>
       </div>
     </div>
@@ -119,7 +119,7 @@
                 searchinfo: [],//左侧列表临时数据
                 textValue: "",//左侧搜索数据
                 serchValue: "",//搜索数据
-                loading: true,
+                loading: false,
                 deleteModal: false, //删除
                 //下拉选项
                 typeList: [
@@ -233,16 +233,22 @@
                 _this.$request.get("/role/list", {search_name: this.textValue}).then(res => {
                     if (res.status === 1) {
                         _this.groupList = res.result.list;
-                        _this.currentGroupId = res.result.list[0].id;
+                        _this.currentGroupId = res.result.list.length > 0 ? res.result.list[0].id : null;
                         _this.$nextTick(() => {
                             _this.initMemberList();
                         });
+
+                        _this.$request.get('/role/rights').then(res => {
+                            _this.roleList = this.treeDepthInitTitle(res.result.list);
+                            if (_this.groupList.length > 0) {
+                                _this.groupList[0].rights.forEach(item => {
+                                    this.initTreeCheck(_this.roleList, item);
+                                })
+                            }
+                        })
                     }
                 });
-                _this.$request.get('/role/rights').then(res => {
-                    this.roleList = this.treeDepthInitTitle(res.result.list)
 
-                })
             },
             //管理群组
             Manageroles() {
@@ -253,27 +259,44 @@
                 this.currentGroupIndex = index;
                 this.currentGroupId = item.id;
                 this.initMemberList(item.id);
+                this.treeDepthInitTitle(this.roleList)
+                item.rights.forEach(item => {
+                    this.initTreeCheck(this.roleList, item)
+                })
             },
             //初始化成员列表
             initMemberList(group_id) {
                 let _this = this;
-                _this.loading = true;
-                _this.$request
-                    .get("/role/member", {
+                if (_this.groupList.length > 0) {
+                    _this.loading = true;
+                    _this.$request.get("/role/member", {
                         id: group_id ? Number(group_id) : _this.groupList[0].id,
                     })
-                    .then(res => {
-                        if (res.status === 1) {
-                            _this.dataList = res.result.list;
-                            // _this.selectedMember = res.result.rights_id;
-                            _this.loading = false;
-                        } else {
-                            _this.$Message.error(res.message);
-                        }
-                    });
+                        .then(res => {
+                            if (res.status === 1) {
+                                _this.dataList = res.result.list;
+                                // _this.selectedMember = res.result.rights_id;
+                                _this.loading = false;
+                            } else {
+                                _this.$Message.error(res.message);
+                            }
+                        });
+                }
+
             },
             selectChange(selection) {
                 this.removeMember = selection;
+            },
+            //点击terr的复选框
+            selectright(val) {
+                let prams = [];
+                val.forEach(item => {
+                    prams.push(item.id)
+                });
+                this.$request.post("/role/updateRigths", {id: this.currentGroupId, rights_id: prams}).then(res => {
+                    this.$Message.success(res.message)
+
+                })
             },
             //初始化树数据结构title的选中状态
             //初始化选中树结构
@@ -282,8 +305,6 @@
                     arr.forEach(item => {
                         if (item.id == filterId) {
                             item.checked = true;
-                            // console.log(item)
-                            this.selectedMember.push(item);
                         } else if (item.children) {
                             this.initTreeCheck(item.children, filterId);
                         }

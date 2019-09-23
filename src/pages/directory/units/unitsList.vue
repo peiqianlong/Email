@@ -10,7 +10,7 @@
         <!-- 顶部操作区   start -->
         <div class="content-search">
           <div class="search iconfont iconsearch">
-            <Input v-model="serchValue" @on-enter="search" :placeholder="$t('message.search')"/>
+            <Input v-model="serchValue" @on-blur="blur" @on-enter="search" :placeholder="$t('message.search')"/>
           </div>
         </div>
         <div class="table">
@@ -205,6 +205,12 @@
             this.initList();
         },
         methods: {
+            //失焦
+            blur() {
+                if (this.serchValue == '') {
+                    this.initList();
+                }
+            },
             //搜索、search
             search() {
                 let _this = this;
@@ -288,7 +294,7 @@
                 return data;
             },
             //获取列表
-            initList() {
+            initList(id = null) {
                 let _this = this;
                 _this.loading = true;
                 _this.$request
@@ -324,7 +330,7 @@
                             _this.$request.post("/department/update", data).then(res => {
                                 if (res.status === 1) {
                                     _this.$Message.success("Success!");
-                                    _this.initList();
+                                    _this.initList(_this.addOrEditForm.id);
                                 } else {
                                     _this.$Message.error(res.message);
                                 }
@@ -335,10 +341,11 @@
                                 title: "",
                                 description: ""
                             };
-                            data.parent_id =
-                                _this.isCreatUnit && data.parent_id === ""
-                                    ? 0
-                                    : _this.addOrEditForm.parent_id;
+                            if (_this.addOrEditForm.parent_id == '') {
+                                _this.$Message.error("Please choose the legitimate department.");
+                                return
+                            }
+                            data.parent_id = _this.addOrEditForm.parent_id;
                             data.title = _this.addOrEditForm.title;
                             data.description = _this.addOrEditForm.description;
                             _this.$request.post("/department/add", data).then(res => {

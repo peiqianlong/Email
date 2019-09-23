@@ -197,8 +197,8 @@
                         this.initData(item.children, level + 1, item);
                     }
                 });
-                if(this.initItems.length==1){
-                    this.toggle(0,this.initItems[0])
+                if (this.initItems.length == 1) {
+                    this.toggle(0, this.initItems[0])
                 }
             },
             //  隐藏显示
@@ -441,6 +441,7 @@
           opacity: 1;
         }
       }
+
       &:first-child:hover {
         .action {
           opacity: 0;

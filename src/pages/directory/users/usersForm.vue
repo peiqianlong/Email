@@ -16,13 +16,13 @@
           :label-width="258"
         >
           <FormItem label="Name:" prop="username">
-            <Input v-model.trim="formData.username" style="width: 200px"></Input>
+            <Input autofocus v-model.trim="formData.username" autocomplete="new-password" style="width: 200px"></Input>
           </FormItem>
           <FormItem label="Account:" prop="account">
             <Input v-model.trim="formData.account" style="width: 240px"></Input>
             <span class="remark-text">{{mailType}}</span>
           </FormItem>
-          <FormItem label="Password:" prop="password">
+          <FormItem label="Password:" :prop="isEdit === 0 ? 'password' : ''">
             <Input
               v-model.trim="formData.password"
               type="password"
@@ -205,7 +205,7 @@
                 if (value.length >= 8 && value.length <= 16) {
                     callback();
                 } else {
-                    callback(new Error("The password contains 8-16 bits"));
+                    callback(new Error("The password contains Numbers and letters, 8-16 bits"));
                 }
             };
             //再次确认密码是否一致
@@ -256,7 +256,7 @@
                         {
                             required: true,
                             pattern: regex.ennum_,
-                            message: "输入不合法",
+                            message: "Illegal input",
                             trigger: "blur"
                         }
                     ],
@@ -268,7 +268,7 @@
                         },
                         {
                             pattern: regex.numenpassword,
-                            message: "The password contains Numbers and letters",
+                            message: "The password contains Numbers and letters, 8-16 bits",
                             trigger: "blur"
                         }
                     ],
