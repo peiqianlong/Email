@@ -32,7 +32,8 @@ import {
   Panel,
   Tabs,
   TabPane,
-  Icon
+  Icon,
+  DatePicker
 } from 'iview';
 import IconPoptip from './components/IconPoptip.vue';
 import EMPage from './components/EMPage.vue'
@@ -45,6 +46,7 @@ import "./utils/router"
 //通用组件全局注册
 Vue.component('Input', Input);
 Vue.component('Content', Content);
+Vue.component('DatePicker', DatePicker);
 Vue.component('Select', Select);
 Vue.component('Option', Option);
 Vue.component('Table', Table);

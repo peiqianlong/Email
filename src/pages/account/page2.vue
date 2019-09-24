@@ -470,45 +470,6 @@
     padding-top: 6px;
   }
 
-  .content-sel {
-    height: 54px;
-    border-bottom: 1px solid rgba(242, 242, 242, 1);
-    display: flex;
-    position: relative;
-    text-align: center;
 
-    .meber {
-      margin-left: 16px;
-      width: 83px;
-      height: 100%;
-      line-height: 54px;
-      color: rgba(119, 119, 119, 1);
-      font-weight: 400;
-      cursor: pointer;
-    }
-
-    .right {
-      width: 64px;
-      height: 100%;
-      line-height: 54px;
-      color: rgba(119, 119, 119, 1);
-      font-weight: 400;
-      cursor: pointer;
-    }
-
-    .selcolor {
-      color: rgba(76, 132, 255, 1);
-      font-weight: bold;
-    }
-
-    .line {
-      position: absolute;
-      height: 2px;
-      width: 83px;
-      bottom: 0;
-      background: rgba(76, 132, 255, 1);
-      transition: all 150ms linear;
-    }
-  }
 
 </style>

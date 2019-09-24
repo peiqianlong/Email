@@ -47,7 +47,7 @@
           <div class="profileitemlist marignT12">
             <div class="text_left">OperationEmail:</div>
             <div class="text_right">
-              {{Companyprofile.info.mobile}}
+              {{Companyprofile.info.spare_email}}
             </div>
           </div>
           <div class="line"></div>
