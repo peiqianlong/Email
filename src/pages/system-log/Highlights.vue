@@ -29,7 +29,7 @@
       <div style="position: relative">
         <div id="main" class="contenttable" style="height:386px;">
         </div>
-        <div class="tips">
+        <div class="tipsline" >
           <div class="Send_mail">
             <div class="line"></div>
             Send mail

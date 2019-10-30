@@ -17,9 +17,12 @@ router.beforeEach((to, from, next) => {
       request.axios("/site/login", formData).then(res => {
         if (res.status === 1) {
           request.setLocal("sid", res.result.sid);
+          request.setLocal("dns_status", res.result.dns_status);
+          if (!res.result.dns_status) {
+            next({path: "/domainname"})
+          }
           request.get("/user/info").then(res => {
             res.status === 1 ? request.setLocal("userInfo", res.result) : next({path: "/nologin"});
-            ;
             next()
           });
         } else {
@@ -29,7 +32,26 @@ router.beforeEach((to, from, next) => {
 
     }
   } else {
-    next()
+    let stuts = localStorage.getItem("dns_status");
+    // stuts ? next() : next({path: "/domainname"})
+    if (to.meta.title == 'domainname'){
+      next()
+    }else {
+      if(stuts == 1){
+        console.log(stuts + "***********")
+        next()
+      }else {
+        console.log(stuts + "##############")
+        next({path: "/domainname"});
+      }
+    }
+
+    // next()
+    // if (localStorage.getItem("dns_status")) {
+    //   next({path: "/nologin"})
+    // }else {
+    //   next()
+    // }
   }
 
 

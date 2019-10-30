@@ -10,6 +10,7 @@ import errorRouter from '@/pages/error/index.js'
 import request from "../utils/axios";
 
 import nologin from '@/pages/nologin'
+import domainname from '@/pages/domainname'
 
 
 Vue.use(Router);
@@ -38,6 +39,13 @@ const routes = [
     component: nologin,
     meta: {
       title: 'nologin'
+    }
+  },
+  {
+    path: '/domainname',
+    component: domainname,
+    meta: {
+      title: 'domainname'
     }
   }
 ];
