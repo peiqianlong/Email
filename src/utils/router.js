@@ -3,9 +3,14 @@ import request from "../utils/axios";
 
 router.beforeEach((to, from, next) => {
   if (to.meta.title == 'home') {
-    if (localStorage.getItem("sid")) {
-      window.document.title = to.meta.title;
-      next()
+    console.log(localStorage.getItem("sid") && localStorage.getItem("dns_status") +"++++++++++++++")
+    if (localStorage.getItem("sid") ) {
+      if(localStorage.getItem("dns_status") != 0){
+        window.document.title = to.meta.title;
+        next()
+      }else {
+        next({path: "/domainname"})
+      }
     } else {
       let str = window.atob(window.location.search.substr(1));
       let usernameReg = new RegExp("(^|&)username=([^&]*)(&|$)");
@@ -34,14 +39,12 @@ router.beforeEach((to, from, next) => {
   } else {
     let stuts = localStorage.getItem("dns_status");
     // stuts ? next() : next({path: "/domainname"})
-    if (to.meta.title == 'domainname'){
+    if (to.meta.title == 'domainname') {
       next()
-    }else {
-      if(stuts == 1){
-        console.log(stuts + "***********")
+    } else {
+      if (stuts == 1) {
         next()
-      }else {
-        console.log(stuts + "##############")
+      } else {
         next({path: "/domainname"});
       }
     }
