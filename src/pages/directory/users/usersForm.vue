@@ -44,9 +44,9 @@
           <div>
             <FormItem label="phone number:" prop="mobile">
               <Select v-model="formData.country_code" style="width: 76px">
-                <Option value="86">+86</Option>
-                <Option value="86">+86</Option>
-                <Option value="86">+86</Option>
+                <Option v-for="(item,index) in countryList" :key="index" :value="JSON.stringify(item)">+{{item.code}}
+                  {{item.text}}
+                </Option>
               </Select>
               <Input v-model="formData.mobile" style="width: 200px"></Input>
             </FormItem>
@@ -54,9 +54,9 @@
           <div>
             <FormItem label="Tel:" prop="tel">
               <Select v-model="formData.tel_code" style="width: 76px">
-                <Option value="86">+86</Option>
-                <Option value="86">+86</Option>
-                <Option value="86">+86</Option>
+                <Option v-for="(item,index) in countryList" :key="index" :value="JSON.stringify(item)">+{{item.code}}
+                  {{item.text}}
+                </Option>
               </Select>
               <Input v-model="formData.tel" style="width: 200px"></Input>
             </FormItem>
@@ -213,6 +213,7 @@
                 if (value === _this.formData.password) {
                     callback();
                 } else {
+
                     callback(new Error("密码不一致"));
                 }
             };
@@ -242,7 +243,9 @@
                     position: "", //职务
                     identity: "0", //身份  0:普通用户；1:上级
                     group_id: "", //邮件群组ID
-                    logon_rights: ["1"] //登录权限  1: imap/smtp；2: pop/smtp；3:secure login
+                    logon_rights: ["1"], //登录权限  1: imap/smtp；2: pop/smtp；3:secure login
+                    country: "",
+                    tel_country: ""
                 },
                 formRule: {
                     username: [
@@ -289,6 +292,7 @@
                     ],
                     tel: [
                         {
+                            required: true,
                             pattern: regex.telephone,
                             message: "请输入正确的座机号码",
                             trigger: "blur"
@@ -303,7 +307,8 @@
                     ]
                 },
                 isEdit: 0, //编辑或新增
-                groupList: []
+                groupList: [],
+                countryList: []
             };
         },
         computed: {
@@ -320,7 +325,7 @@
             this.isEdit = this.$route.query.isEdit;
             //初始化邮箱后缀
             let email = JSON.parse(window.localStorage.userInfo);
-            this.mailType = "@" + email.username.split("@")[1];
+            this.mailType = email.domain;
             if (this.isEdit !== "0") {
                 this.getDetail();
             } else {
@@ -334,16 +339,27 @@
                     this.formData.dept_id = this.arrToStr(this.selectedDepartment, "id");
                 }
             }
+
+        },
+        mounted() {
+            this.codeinfo();
         },
 
         methods: {
+            codeinfo() {
+                this.$request.post("/site/countryCode").then(res => {
+                    this.countryList = res.result.country
+                })
+            }
+            ,
             arrToStr(arr, name) {
                 let str = "";
                 arr.forEach(item => {
                     str += `${item[name].replace(/\([0-9]+\)/, "")},`;
                 });
                 return str.slice(0, str.length - 1);
-            },
+            }
+            ,
             //生成随机密码
             ResetNum() {
                 let psw =
@@ -355,11 +371,13 @@
                 }
                 this.formData.password = str;
                 this.pwsmo = true;
-            },
+            }
+            ,
             //点击复制密码
             copytext(psw) {
                 document.execCommand(psw);
-            },
+            }
+            ,
             //获取详情信息
             getDetail() {
                 let _this = this;
@@ -387,7 +405,8 @@
                             }
                         }
                     });
-            },
+            }
+            ,
             //初始化树数据结构
             treeDepthInit(arr, filterId = null) {
                 if (Array.isArray(arr)) {
@@ -400,7 +419,8 @@
                     });
                 }
                 return arr;
-            },
+            }
+            ,
             //初始化默认选中节点
             initTreeCheck(arr, filterId) {
                 if (Array.isArray(arr)) {
@@ -413,7 +433,8 @@
                     });
                 }
                 return arr;
-            },
+            }
+            ,
             //取消选中的节点
             cancelTreeCheck(arr, filterId) {
                 if (Array.isArray(arr)) {
@@ -426,7 +447,8 @@
                     });
                 }
                 return arr;
-            },
+            }
+            ,
             //初始化树
             initTree() {
                 let _this = this;
@@ -454,39 +476,46 @@
                             _this.$Message.error(res.message);
                         }
                     });
-            },
+            }
+            ,
             //穿梭框部门树点击事件
             departmentCheckChange(row) {
                 console.log(row);
                 this.transferDepartment = row;
-            },
+            }
+            ,
             //删除选中的部门
             deleteDepartment(item, index) {
                 console.log(item);
                 this.transferDepartment.splice(index, 1);
                 this.departmentData = this.cancelTreeCheck(this.departmentData, item.id);
-            },
+            }
+            ,
             //显示部门弹层
             changeSection() {
                 this.ShuttleSectionModal = true;
                 this.initTree();
                 this.transferDepartment = [...this.selectedDepartment];
-            },
+            }
+            ,
             //部门穿梭框确认
             sectionOk() {
                 this.selectedDepartment = [...this.transferDepartment];
                 this.formData.dept_id = this.arrToStr(this.selectedDepartment, "id");
-            },
+            }
+            ,
             //部门穿梭框取消
             sectionCancle() {
                 this.transferDepartment = [];
-            },
+            }
+            ,
             //显示群组弹层
             changeGroup() {
                 this.groupListGet();
                 this.ShuttleGroupModal = true;
                 this.transferGroup = [...this.selectedGroup];
-            },
+            }
+            ,
             //获取群组信息
             groupListGet() {
                 let _this = this;
@@ -495,7 +524,8 @@
                         _this.groupList = res.result.list;
                     }
                 });
-            },
+            }
+            ,
             //选中群组
             groupItemClick(item) {
                 let obj = {
@@ -508,28 +538,43 @@
                     return value.id == obj.id;
                 });
                 flag === -1 ? this.transferGroup.push(obj) : "";
-            },
+            }
+            ,
             //群组穿梭框确认
             groupOk() {
                 this.selectedGroup = [...this.transferGroup];
                 this.formData.group_id = this.arrToStr(this.selectedGroup, "id");
-            },
+            }
+            ,
             groupCancle() {
                 this.transferGroup = [];
-            },
+            }
+            ,
             //群组穿梭框删除
             deleteGroup(item, index) {
                 this.transferGroup.splice(index, 1);
-            },
+            }
+            ,
             //表单保存
             handleSubmit(name) {
                 let _this = this;
                 _this.stopclick = true;
+
                 _this.$refs[name].validate(valid => {
                     if (valid) {
                         let {...obj} = _this.formData;
+                        let info = JSON.parse(_this.formData.country_code);
+                        let info2 = JSON.parse(_this.formData.tel_code);
                         obj.dept_id = obj.dept_id.split(",");
                         obj.group_id = obj.group_id.length > 0 ? obj.group_id.split(",") : [];
+                        obj.country_code = info.code;
+                        obj.country = info.id;
+                        obj.tel_code = info2.code;
+                        obj.tel_country = info2.id;
+                        if (!obj.country || obj.tel_country) {
+                            _this.$Message.success("fail!");
+                            return
+                        }
                         _this.$request
                             .post(_this.isEdit ? "/member/update" : "/member/add", obj)
                             .then(res => {
@@ -547,12 +592,14 @@
                         this.$Message.error("Fail!");
                     }
                 });
-            },
+            }
+            ,
             //重置
             handleReset(name) {
                 this.$refs[name].resetFields();
                 this.$router.push("/users");
             }
         }
-    };
+    }
+    ;
 </script>
