@@ -59,6 +59,7 @@
         <FormItem label="description" prop="description">
           <Input type="text" v-model.trim="addOrEditForm.description" placeholder="Description"></Input>
         </FormItem>
+        <div>Parent organzational unit*</div>
         <FormItem v-if="isCreatUnit" prop="parent_id">
           <div class="tree-select">
             <Tree :data="unitsTree" @on-select-change="createUnitTreeClick"></Tree>
@@ -475,3 +476,6 @@
         }
     };
 </script>
+<style>
+  .ivu-tree ul li{padding: 0 5px}
+</style>

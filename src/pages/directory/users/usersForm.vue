@@ -22,18 +22,28 @@
             <Input v-model.trim="formData.account" style="width: 240px"></Input>
             <span class="remark-text">{{mailType}}</span>
           </FormItem>
-          <FormItem label="Password:" :prop="isEdit === 0 ? 'password' : ''">
-            <Input
-              v-model.trim="formData.password"
-              type="password"
-              :maxlength="16"
-              style="width: 520px"
-            ></Input>
-            <button class="primary" @click.prevent="ResetNum">Reset</button>
-          </FormItem>
-          <FormItem label="Verify Password:" prop="password_verify">
-            <Input :maxlength="16" v-model.trim="formData.password_verify" type="password" style="width: 520px"></Input>
-          </FormItem>
+          <div style="margin-bottom: 26px;display:flex" v-if="pswedit">
+            <div style="width:258px;color: #111;font-size: 14px;font-weight: bold;">Password:
+            </div>
+            <div @click="psweditfun" style="font-size:14px;color:rgba(76,132,255,1);cursor: pointer">Modify password>>
+            </div>
+          </div>
+          <div v-else>
+            <FormItem label="Password:" :prop="isEdit === 0 ? 'password' : ''">
+              <Input
+                v-model.trim="formData.password"
+                type="password"
+                :maxlength="16"
+                style="width: 520px"
+              ></Input>
+              <button class="primary" @click.prevent="ResetNum">Reset</button>
+            </FormItem>
+            <FormItem label="Verify Password:" prop="password_verify">
+              <Input :maxlength="16" v-model.trim="formData.password_verify" type="password"
+                     style="width: 520px"></Input>
+            </FormItem>
+          </div>
+
           <FormItem label="gender:" prop="sex">
             <RadioGroup v-model="formData.sex">
               <Radio label="1">Male</Radio>
@@ -136,6 +146,7 @@
               show-checkbox
               @on-check-change="departmentCheckChange"
               check-strictly
+              @on-select-change="handleSelect"
             ></Tree>
           </div>
         </div>
@@ -285,14 +296,12 @@
                     mobile: [
                         {
                             required: true,
-                            pattern: regex.phone,
                             message: "请输入11手机号码",
                             trigger: "blur"
                         }
                     ],
                     tel: [
                         {
-                            required: true,
                             pattern: regex.telephone,
                             message: "请输入正确的座机号码",
                             trigger: "blur"
@@ -307,6 +316,7 @@
                     ]
                 },
                 isEdit: 0, //编辑或新增
+                pswedit: 0,
                 groupList: [],
                 countryList: []
             };
@@ -323,7 +333,9 @@
         },
         created() {
             this.isEdit = this.$route.query.isEdit;
+            this.pswedit = this.$route.query.isEdit;
             //初始化邮箱后缀
+            this.codeinfo();
             let email = JSON.parse(window.localStorage.userInfo);
             this.mailType = email.domain;
             if (this.isEdit !== "0") {
@@ -341,11 +353,11 @@
             }
 
         },
-        mounted() {
-            this.codeinfo();
-        },
-
         methods: {
+            handleSelect(selectedList) {
+                var ele = selectedList[selectedList.length - 1]; //当前选中的树节点
+                ele.expand = true; //设置为展开
+            },
             codeinfo() {
                 this.$request.post("/site/countryCode").then(res => {
                     this.countryList = res.result.country
@@ -403,6 +415,23 @@
                                         _this.formData[key] = obj[key];
                                 }
                             }
+                            let countrycode = this.formData.country_code;
+                            let tel_code = this.formData.tel_code;
+                            if (countrycode !== '') {
+                                this.countryList.forEach((item, index) => {
+                                    if (item.code == countrycode) {
+                                        this.formData.country_code = JSON.stringify(this.countryList[index])
+                                    }
+                                })
+                            }
+                            if (tel_code !== '') {
+                                this.countryList.forEach((item, index) => {
+                                    if (item.code == tel_code) {
+                                        this.formData.tel_code = JSON.stringify(this.countryList[index])
+                                    }
+                                })
+                            }
+
                         }
                     });
             }
@@ -559,22 +588,42 @@
             handleSubmit(name) {
                 let _this = this;
                 _this.stopclick = true;
-
                 _this.$refs[name].validate(valid => {
                     if (valid) {
                         let {...obj} = _this.formData;
-                        let info = JSON.parse(_this.formData.country_code);
-                        let info2 = JSON.parse(_this.formData.tel_code);
+                        debugger
+
+
                         obj.dept_id = obj.dept_id.split(",");
                         obj.group_id = obj.group_id.length > 0 ? obj.group_id.split(",") : [];
-                        obj.country_code = info.code;
-                        obj.country = info.id;
-                        obj.tel_code = info2.code;
-                        obj.tel_country = info2.id;
-                        if (!obj.country || obj.tel_country) {
-                            _this.$Message.success("fail!");
-                            return
+
+                        if (_this.formData.country_code != '') {
+                            let info = JSON.parse(_this.formData.country_code);
+                            obj.country_code = info.code;
+                            obj.country = info.id;
                         }
+                        if (_this.formData.tel_code != '') {
+                            let info2 = JSON.parse(_this.formData.tel_code);
+                            obj.tel_code = info2.code;
+                            obj.tel_country = info2.id;
+                        }
+                        if (_this.isEdit) {
+
+
+                        } else {
+                            // let info = JSON.parse(_this.formData.country_code);
+                            // let info2 = JSON.parse(_this.formData.tel_code);
+                            // obj.country_code = info.code;
+                            // obj.country = info.id;
+                            // obj.tel_code = info2.code;
+                            // obj.tel_country = info2.id;
+                            if (!obj.country) {
+                                _this.$Message.error("fail!");
+                                return
+                            }
+                        }
+
+
                         _this.$request
                             .post(_this.isEdit ? "/member/update" : "/member/add", obj)
                             .then(res => {
@@ -598,6 +647,10 @@
             handleReset(name) {
                 this.$refs[name].resetFields();
                 this.$router.push("/users");
+            },
+            //密码切换  编辑和新增
+            psweditfun() {
+                this.pswedit = !this.pswedit;
             }
         }
     }

@@ -9,12 +9,11 @@
           <button>{{$t('operation.import')}}</button>
           <ul class="oper-list">
             <div style="height: 32px;position: relative">
-              <Upload action="/api/member/export" :show-upload-list='false' :data="uploaddata"
+              <Upload action="/api/member/import" :show-upload-list='false' :data="uploaddata"
                       :on-success="uploadsuccess" :on-error="uploadfile">
                 <li>{{$t('operation.import')}}</li>
               </Upload>
             </div>
-
             <li @click="temoDownLoad">{{$t('operation.download_the_template')}}</li>
           </ul>
         </div>
@@ -231,7 +230,7 @@
                 pageInfo: {
                     page_current: 1,
                     total: 0,
-                    page_size: 20,
+                    page_size: 10,
                     page_count: 0
                 },
                 renameModal: false, //重命名弹层
@@ -271,11 +270,11 @@
         },
         methods: {
             // 文件上传成功的行数
-            uploadsuccess() {
-                this.$Message.success("Upload success")
+            uploadsuccess(res) {
+                this.$Message.info(res.message)
             },
-            uploadfile(val) {
-                this.$Message.error("Upload failure")
+            uploadfile(res) {
+                this.$Message.info(res.message)
             },
             //失焦
             blur() {

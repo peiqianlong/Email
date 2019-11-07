@@ -154,7 +154,7 @@
                             obj.id = index;
                             obj.title = _this.$t("menu.administrator_role");
                             obj.text = _this.$t("homeMessage.menu.administrator_role");
-                            obj.url = "";
+                            obj.url = "/account2";
                             _this.menuList.push(obj);
                             break;
                     }

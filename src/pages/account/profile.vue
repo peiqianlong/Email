@@ -332,7 +332,7 @@
               />
             </FormItem>
           </div>
-          <FormItem label="country_code:" style="width:50%">
+          <FormItem label="verify_code:" style="width:50%">
             <Input v-model.trim="formItem.emailyzm" placeholder="Enter code" />
           </FormItem>
           <FormItem style="margin-top:40px">

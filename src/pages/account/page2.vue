@@ -45,7 +45,7 @@
           <div class="search iconfont iconsearch">
             <Input @on-enter="initGroupList" v-model="serchValue" :placeholder="$t('message.search')"/>
           </div>
-          <div class="searchBtn">Search</div>
+          <div class="searchBtn" @click="initGroupList">Search</div>
         </div>
         <div v-if="line === 1" class="table">
           <Table
