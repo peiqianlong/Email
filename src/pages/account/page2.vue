@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="btm-footer">
-        <button @click="Manageroles">Manage groups</button>
+        <button @click="Manageroles">Manage roles</button>
       </div>
     </div>
     <!-- 左侧内容   end -->
@@ -102,11 +102,13 @@
     <!-- 删除Modal start -->
     <Modal
       v-model="deleteModal"
-      title="Delete the member"
+      title="Delete the role"
       class-name="vertical-center-modal"
       @on-ok="deleteOk()"
+      :ok-text="$t('operation.yes')"
+      :cancel-text="$t('operation.cancle')"
     >
-      <div class="reminder">Are you sure to delete these members？</div>
+      <div class="reminder">Are you sure to delete this role?</div>
     </Modal>
     <!-- 删除Modal end -->
   </div>
@@ -271,6 +273,7 @@
                     _this.loading = true;
                     _this.$request.get("/role/member", {
                         id: group_id ? Number(group_id) : _this.groupList[0].id,
+                        search_name: this.serchValue
                     })
                         .then(res => {
                             if (res.status === 1) {

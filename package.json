@@ -15,6 +15,7 @@
     "file-save": "^0.2.0",
     "file-saver": "^2.0.2",
     "iview": "^3.4.2",
+    "view-design": "^4.0.2",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
     "xlsx": "^0.15.1"

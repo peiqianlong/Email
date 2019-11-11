@@ -19,7 +19,7 @@
             <Input autofocus v-model.trim="formData.username" autocomplete="new-password" style="width: 200px"></Input>
           </FormItem>
           <FormItem label="Account:" prop="account">
-            <Input v-model.trim="formData.account" style="width: 240px"></Input>
+            <Input :disabled="isEdit ===0 ?false:true" v-model.trim="formData.account" style="width: 240px"></Input>
             <span class="remark-text">{{mailType}}</span>
           </FormItem>
           <div style="margin-bottom: 26px;display:flex" v-if="pswedit">
@@ -53,7 +53,7 @@
           <Divider/>
           <div>
             <FormItem label="phone number:" prop="mobile">
-              <Select v-model="formData.country_code" style="width: 76px">
+              <Select placeholder="lace Change" v-model="formData.country_code" style="width: 76px">
                 <Option v-for="(item,index) in countryList" :key="index" :value="JSON.stringify(item)">+{{item.code}}
                   {{item.text}}
                 </Option>
@@ -63,7 +63,7 @@
           </div>
           <div>
             <FormItem label="Tel:" prop="tel">
-              <Select v-model="formData.tel_code" style="width: 76px">
+              <Select  placeholder="Place Change" v-model="formData.tel_code" style="width: 76px">
                 <Option v-for="(item,index) in countryList" :key="index" :value="JSON.stringify(item)">+{{item.code}}
                   {{item.text}}
                 </Option>
@@ -94,8 +94,8 @@
           </FormItem>
           <FormItem label="Identity:" prop="identity">
             <RadioGroup v-model="formData.identity">
-              <Radio label="0">普通用户</Radio>
-              <Radio label="1">上级</Radio>
+              <Radio label="0">Rank and File</Radio>
+              <Radio label="1">Superior</Radio>
             </RadioGroup>
           </FormItem>
           <FormItem label="Group:" prop="group_id">
@@ -114,10 +114,18 @@
           <Divider/>
           <FormItem class="operations">
             <button
+              v-if="isEdit === 1"
               class="primary"
               :disabled="stopclick"
               @click.prevent="handleSubmit('formData')"
             >Save changes
+            </button>
+            <button
+              v-else
+              class="primary"
+              :disabled="stopclick"
+              @click.prevent="handleSubmit('formData')"
+            >Save
             </button>
             <button
               class="gray"
@@ -137,6 +145,8 @@
       class-name="vertical-center-modal"
       @on-cancel="sectionCancle"
       @on-ok="sectionOk"
+      :ok-text="$t('operation.yes')"
+      :cancel-text="$t('operation.cancle')"
     >
       <div class="transfer fn-clear">
         <div class="item float-left">
@@ -169,6 +179,8 @@
       class-name="vertical-center-modal"
       @on-cancel="groupCancle"
       @on-ok="groupOk"
+      :ok-text="$t('operation.yes')"
+      :cancel-text="$t('operation.cancle')"
     >
       <div class="transfer fn-clear">
         <div class="item float-left">
@@ -245,7 +257,7 @@
                     password: "", //邮箱密码
                     password_verify: "", //邮箱确认密码
                     sex: "2", //性别 1:男；2:女
-                    country_code: "86", //手机号码国家区号
+                    country_code: "86", //手机号码国phone number:家区号
                     mobile: "", //手机号码
                     tel_code: "86", //座机/手机号码国家区号
                     tel: "", //座机/手机号码
@@ -656,3 +668,8 @@
     }
     ;
 </script>
+<style>
+  .ivu-select-single .ivu-select-selection .ivu-select-placeholder {
+    color: #111 !important;
+  }
+</style>

@@ -10,7 +10,7 @@
         <!-- 顶部操作区   start -->
         <div class="content-search">
           <div class="search iconfont iconsearch">
-            <Input :placeholder="$t('message.search')"/>
+            <Input v-model="Search_name" @on-enter="initList" :placeholder="$t('message.search')"/>
           </div>
         </div>
         <div class="table">
@@ -57,7 +57,8 @@
       >
         <div class="form-title">Group details</div>
         <FormItem label="group_name" prop="group_name">
-          <Input type="text" autocomplete="new-password" v-model.trim="addOrEditForm.group_name" placeholder="Names"></Input>
+          <Input type="text" autocomplete="new-password" v-model.trim="addOrEditForm.group_name"
+                 placeholder="Names"></Input>
         </FormItem>
         <FormItem label="description" prop="description">
           <Input type="text" v-model.trim="addOrEditForm.description" placeholder="Description"></Input>
@@ -121,11 +122,19 @@
     <!-- 删除Modal start -->
     <Modal
       v-model="deleteModal"
-      title="Delete the member"
+      title="Delete the group"
       class-name="vertical-center-modal"
       @on-ok="deleteOk()"
+      :ok-text="$t('operation.delete')"
+      :cancel-text="$t('operation.cancle')"
     >
-      <div class="reminder">Are you sure to delete these members？</div>
+      <div class="reminder">All group information , including its email addresses and settings, will be deleted.
+        Members's
+        account aren't deleted
+      </div>
+      <div class="reminder">
+        You can't undo this action
+      </div>
     </Modal>
     <!-- 删除Modal end -->
   </div>
@@ -152,6 +161,7 @@
                 }
             };
             return {
+                Search_name:'',
                 loading: true,
                 addOrEditModal: false, //添加编辑弹层
                 deleteModal: false, //删除提示弹层
@@ -369,7 +379,8 @@
                 _this.$request
                     .get("/group/list", {
                         page: _this.pageInfo.page_current,
-                        page_size: _this.pageInfo.page_size
+                        page_size: _this.pageInfo.page_size,
+                        search_name:this.Search_name
                     })
                     .then(res => {
                         if (res.status === 1) {

@@ -2,7 +2,7 @@
   <div class="tree-table">
     <ul class="tree-table-header">
       <li v-for="(column,index) in cloneColumns" :key="column.index" v-if="column.type!=='action'">
-        <div>{{ renderHeader(column, index) }}</div>
+        <div>{{renderHeader(column, index) }}</div>
       </li>
     </ul>
     <ul class="tree-table-body">
@@ -30,7 +30,15 @@
             </span>
             {{renderBody(item,column) }}
           </div>
-          <div v-if="column.type === 'action'">
+          <div v-if="column.type === 'action' && item.id !== '62' ">
+            <!--<IconPoptip
+              @popClick="RowClick(item,action.type)"
+              v-for="action in (column.actions)"
+              :key="action.id"
+              :iconName="action.iconName"
+              :title="action.title"
+              v-if="item.id === '62'"
+            ></IconPoptip>-->
             <IconPoptip
               @popClick="RowClick(item,action.type)"
               v-for="action in (column.actions)"
@@ -443,9 +451,9 @@
       }
 
       &:first-child:hover {
-        .action {
-          opacity: 0;
-        }
+        /*.action {*/
+        /*  opacity: 0;*/
+        /*}*/
       }
     }
 

@@ -37,7 +37,7 @@ module.exports = {
     create_unit: 'Create new organizational unit',
     cancle: 'cancle',
     yes: 'yes',
-    move: 'move'
+    move: 'move',
   },
   //列表内操作按钮
   popbutton: {

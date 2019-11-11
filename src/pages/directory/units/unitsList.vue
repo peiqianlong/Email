@@ -59,7 +59,7 @@
         <FormItem label="description" prop="description">
           <Input type="text" v-model.trim="addOrEditForm.description" placeholder="Description"></Input>
         </FormItem>
-        <div>Parent organzational unit*</div>
+        <div style="font-size: 14px;line-height: 17px;color: #777;">Parent organzational unit*</div>
         <FormItem v-if="isCreatUnit" prop="parent_id">
           <div class="tree-select">
             <Tree :data="unitsTree" @on-select-change="createUnitTreeClick"></Tree>
@@ -76,6 +76,7 @@
       @on-ok="moveUnitOk"
       @on-cancel="cancelMoveUnit"
       :ok-text="$t('operation.move')"
+      :cancel-text="$t('operation.cancle')"
     >
       <div class="tree-select">
         <Tree :data="unitsTree" @on-select-change="moveUnitTreeClick"></Tree>
@@ -85,11 +86,14 @@
     <!-- 删除Modal start -->
     <Modal
       v-model="deleteModal"
-      title="Delete the member"
+      title="Delete organizational unit"
       class-name="vertical-center-modal"
       @on-ok="deleteOk()"
+      :ok-text="$t('operation.delete')"
+      :cancel-text="$t('operation.cancle')"
+
     >
-      <div class="reminder">Are you sure to delete these members？</div>
+      <div class="reminder">You are about to delete organizational unit. This organization can'tbe deleted if it has usere</div>
     </Modal>
     <!-- 删除Modal end -->
   </div>
@@ -388,7 +392,12 @@
                         id: _this.deleteUnitId
                     })
                     .then(res => {
-                        _this.$Message.success("Success!");
+                        if(res.status === 1){
+                            _this.$Message.success(res.message);
+                        }else {
+                            _this.$Message.error(res.message);
+                        }
+
                         _this.initList();
                     });
             },
@@ -477,5 +486,5 @@
     };
 </script>
 <style>
-  .ivu-tree ul li{padding: 0 5px}
+  .ivu-tree ul li{padding: 0 5px !important;}
 </style>

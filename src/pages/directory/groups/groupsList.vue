@@ -73,7 +73,7 @@
       <div class="transfer fn-clear">
         <div class="item float-left">
           <div class="search iconfont iconsearch">
-            <Input :placeholder="$t('message.search')"/>
+            <Input v-model="searchName" :placeholder="$t('message.search')"/>
           </div>
           <div class="item-content">
             <Tree :data="memberTreeData" show-checkbox @on-check-change="memberCheckChange"></Tree>
@@ -94,11 +94,14 @@
     <!-- 删除Modal start -->
     <Modal
       v-model="deleteModal"
-      title="Delete the member"
+      title="Shift Out Members"
       class-name="vertical-center-modal"
       @on-ok="deleteOk()"
+      :ok-text="$t('operation.delete')"
+      :cancel-text="$t('operation.cancle')"
     >
-      <div class="reminder">Are you sure to delete these members？</div>
+      <div class="reminder">Are you sure to Shift out these members？
+      </div>
     </Modal>
     <!-- 删除Modal end -->
   </div>
@@ -110,6 +113,7 @@
                 searchinfo: [],//左侧列表临时数据
                 textValue: "",//左侧搜索数据
                 serchValue: "",//搜索数据
+                searchName: "",
                 loading: true,
                 deleteModal: false, //删除
                 selectType: "0", //被选项值

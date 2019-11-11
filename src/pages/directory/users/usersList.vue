@@ -9,8 +9,9 @@
           <button>{{$t('operation.import')}}</button>
           <ul class="oper-list">
             <div style="height: 32px;position: relative">
-              <Upload action="/api/member/import" :show-upload-list='false' :data="uploaddata"
-                      :on-success="uploadsuccess" :on-error="uploadfile">
+              <Upload action="http://api.phrmg.org/admin/member/import" :show-upload-list='false' name="file"
+                      :data="uploaddata"
+                      :on-success="uploadsuccess" :on-error="uploadfile" :before-upload="fileSuccess">
                 <li>{{$t('operation.import')}}</li>
               </Upload>
             </div>
@@ -125,6 +126,8 @@
       title="Delete the member"
       class-name="vertical-center-modal"
       @on-ok="deleteOk()"
+      :ok-text="$t('operation.delete')"
+      :cancel-text="$t('operation.cancle')"
     >
       <div class="reminder">Are you sure to delete these members？</div>
     </Modal>
@@ -139,7 +142,8 @@
                 //上传文件附带的参数
                 uploaddata: {
                     channel: "0001",
-                    sid: JSON.parse(window.localStorage.getItem("sid"))
+                    sid: JSON.parse(window.localStorage.getItem("sid")),
+                    filename: ""
                 },
                 textValue: "",//
                 deleteModal: false, //删除弹层
@@ -272,6 +276,9 @@
             // 文件上传成功的行数
             uploadsuccess(res) {
                 this.$Message.info(res.message)
+            },
+            fileSuccess(res) {
+                this.uploaddata.filename = res.name;
             },
             uploadfile(res) {
                 this.$Message.info(res.message)

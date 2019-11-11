@@ -66,7 +66,8 @@
             <Icon type="md-add" size="20"/>
           </div>
         </Upload>
-        <Modal title="View Image" v-model="visible">
+        <Modal title="View Image" v-model="visible" :ok-text="$t('operation.delete')"
+               :cancel-text="$t('operation.cancle')">
           <img :src="'https://o5wwk8baw.qnssl.com/' + imgName + '/large'" v-if="visible" style="width: 100%">
         </Modal>
       </div>
@@ -233,7 +234,7 @@
                             : "";
                     this.$store.commit("menuToggle");
                 } else {
-                    this.modal6 = true
+                    // this.modal6 = true
                 }
 
             },
