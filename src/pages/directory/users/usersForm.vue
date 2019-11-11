@@ -53,7 +53,7 @@
           <Divider/>
           <div>
             <FormItem label="phone number:" prop="mobile">
-              <Select placeholder="lace Change" v-model="formData.country_code" style="width: 76px">
+              <Select placeholder="Please choose" v-model="formData.country_code" style="width: 76px">
                 <Option v-for="(item,index) in countryList" :key="index" :value="JSON.stringify(item)">+{{item.code}}
                   {{item.text}}
                 </Option>
@@ -63,7 +63,7 @@
           </div>
           <div>
             <FormItem label="Tel:" prop="tel">
-              <Select  placeholder="Place Change" v-model="formData.tel_code" style="width: 76px">
+              <Select  placeholder="Please choose" v-model="formData.tel_code" style="width: 76px">
                 <Option v-for="(item,index) in countryList" :key="index" :value="JSON.stringify(item)">+{{item.code}}
                   {{item.text}}
                 </Option>

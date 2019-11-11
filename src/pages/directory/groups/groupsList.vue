@@ -52,6 +52,13 @@
           ></Table>
         </div>
       </div>
+      <div class="btm-footer">
+        <EMPage
+          :currentPage="pageInfo.page_current"
+          :totalPage="pageInfo.page_count"
+          @on-change="changePage"
+        ></EMPage>
+      </div>
     </div>
     <!-- 右侧内容   end -->
     <!-- 成员穿梭框弹层  start -->
@@ -100,7 +107,7 @@
       :ok-text="$t('operation.delete')"
       :cancel-text="$t('operation.cancle')"
     >
-      <div class="reminder">Are you sure to Shift out these members？
+      <div class="reminder">Are you sure to shift out these members？
       </div>
     </Modal>
     <!-- 删除Modal end -->
@@ -198,7 +205,13 @@
                 addMemberModal: false, //添加成员弹层
                 selectedMember: [], //穿梭框被选中的成员
                 memberTreeData: [],
-                selectedMemberType: 0 //是否只查看enabled用户
+                selectedMemberType: 0,//是否只查看enabled用户
+                pageInfo: {
+                    page_current: 1,
+                    total: 0,
+                    page_size: 10,
+                    page_count: 0
+                }
             };
         },
         created() {
@@ -216,7 +229,12 @@
                     this.initMemberList(this.currentGroupId);
                 }
             },
-
+            //分页
+            changePage(val) {
+                debugger
+                this.pageInfo.page_current = val;
+                this.initGroupList();
+            },
             //左侧搜索
             search() {
                 let _this = this;
@@ -282,11 +300,14 @@
                     .get("/group/member", {
                         id: group_id ? Number(group_id) : _this.currentGroupId,
                         search_name: this.serchValue,
-                        search_type: this.selectType
+                        search_type: this.selectType,
+                        page: this.pageInfo.page_current,
+                        page_size: this.pageInfo.page_size
                     })
                     .then(res => {
                         if (res.status === 1) {
                             _this.dataList = res.result.list;
+                            _this.pageInfo = res.result.page_info;
                             _this.loading = false;
                         } else {
                             _this.$Message.error(res.message);
@@ -415,7 +436,7 @@
                     arr.push(item.id);
                 });
                 if (arr.length === 0) {
-                    this.$Message.warning("请选择成员！");
+                    this.$Message.warning("Please select members!");
                     return false;
                 } else {
                     this.deleteModal = true;

@@ -4,7 +4,6 @@
       <i class="left-icon profile"></i>
       <div class="text">
         <div class="tool-title">Profile</div>
-        <div class="tool-desc">nancy</div>
       </div>
     </div>
     <Collapse simple>
@@ -295,7 +294,7 @@
         <Form ref="phone" :model="formItem" :rules="ruleInline" inline label-position="top">
           <div>
             <FormItem label="Phone Number:" prop="phone" style="width:100%">
-              <Select v-model="formItem.country_code" style="width:76px">
+              <Select  placeholder="Please choose" v-model="formItem.country_code" style="width:76px">
                 <Option v-for="(item,index) in countryList" :key="index" :value="JSON.stringify(item)">+{{item.code}}
                   {{item.text}}
                 </Option>
